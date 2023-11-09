@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Finder</title>
+    <style>
+        body {
+            background-image: url("https://www.teahub.io/photos/full/93-938757_75-web-website-background-color.jpg");
+        }
+        .container {
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 300px;
+        }
+
+        #search-btn {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #search-btn:hover {
+            background-color: #3e8e41;
+        }
+
+        .hospital-list {
+            flex: 1;
+            padding: 10px;
+            border-right: 1px solid #ddd;
+        }
+
+        .hospital-label {
+            display: block;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ayush Services Availability</h1>
+        <label for="search-bar">Enter a location:</label>
+        <br>
+        <input type="text" id="search-bar" placeholder="Search...">
+        <br><br>
+        <input type="submit" id="search-btn" value="Search">
+        <br><br>
+        <div id="hospital-list"></div>
+        <div id="hospital-details">
+            <table>
+                <tr>
+                    <th>Address</th>
+                    <th>Phone</th>
+                    <th>Beds Available</th>
+                </tr>
+                <tr>
+                    <td id="address"></td>
+                    <td id="phone"></td>
+                    <td id="beds"></td>
+                </tr>
+            </table>
+            <h2>Doctors Available</h2>
+            <ul id="doctors"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Define an array of hospitals with their details
+        var hospitals = [
+            {
+                name: "Gleneagles Global Health City",
+                address: "439, Embassy Residency Rd, Sholinganallur,Perumbakkam, Chennai, Tamilnadu 600100",
+                phone: "044-44777000",
+                beds: 200,
+                location: { lat: 12.8985961, lng: 80.2065746 },
+                doctors: [
+                    { name: "Dr. Rajasundaram, Dr. Ponni Sivaprakasam, Dr. Rajeswari S", specialization: "Oncology" },
+                    { name: "Dr. Murugnandhyam K, Dr. Karthik V C", specialization: "Urology" },
+                    { name: "Dr. Padmapriya Vivek", specialization: "Gynaecology" }
+                ]
+            },
+            {
+                name: "Swaram Hospital",
+                address: "13, Doraiswamy Street, 2nd lane, Perumbakkam main Rd, Sholinganallur, Chennai, Tamilnadu 600119",
+                phone: "044-45086262",
+                beds: 50,
+                location: { lat: 12.9010822, lng: 80.2285489 },
+                doctors: [
+                    { name: "Dr. Naveen", specialization: "Orthopaedics" },
+                    { name: "Dr. Divya", specialization: "Gynaecology" },
+                    { name: "Dr. Karthikayen", specialization: "Cardiology" }
+                ]
+            },
+            {
+                name: "Sundaram Medical Foundation Dr. Rangarajan Memorial Hospital",
+                address: "9C, 4th Ave, AH block, Shanthi colony, Anna nagar, Chennai, Tamilnadu 600040",
+                phone: "044-26144100",
+                beds: 220,
+                location: { lat: 13.0824508, lng: 80.2069478 },
+                doctors: [
+                    { name: "Dr. Dr. Joy M Thomas, Dr. K Jayanthi", specialization: "Cardiology" },
+                    { name: "Dr. K. N. Sarveswari, Dr.Vignesh Karthik.N", specialization: "Dermatology" },
+                    { name: "Dr. V. Sumathy, Dr. M. Ilambarathi", specialization: "ENT" }
+                ]
+            },
+            {
+                name: "Be Well Hospital",
+                address: "No.106, Jawaharlal Nehru Salai, Koyambedu Flyover, Anna nagar west, Chennai, Tamilnadu 600040",
+                phone: "07402-723430",
+                beds: 45,
+                location: { lat: 13.0794727, lng: 80.1981736 },
+                doctors: [
+                    { name: "Dr. Santhosh Jacob", specialization: "Orthopedic Surgeon" },
+                    { name: "Dr. Pradeep", specialization: "Diabetology" },
+                    { name: "Dr. R. Sabarisan", specialization: "General Surgeon" }
+                ]
+            }
+        ];
+
+        // Get the search button and input element
+        var searchBtn = document.getElementById("search-btn");
+        var searchBar = document.getElementById("search-bar");
+
+        // Get the hospital list and hospital details elements
+        var hospitalList = document.getElementById("hospital-list");
+        var hospitalDetails = document.getElementById("hospital-details");
+        var address = document.getElementById("address");
+        var phone = document.getElementById("phone");
+        var beds = document.getElementById("beds");
+        var doctors = document.getElementById("doctors");
+
+        //Function to display hospital list
+        //function displayHospitalList(list) {
+        //    hospitalList.innerHTML = "";
+        //    list.forEach(function (hospital) {
+        //        var div = document.createElement("div");
+        //        var name = document.createElement("p");
+        //        name.innerHTML = hospital.name;
+        //        div.appendChild(name);
+        //        div.addEventListener("click", function () {
+        //            displayHospitalDetails(hospital);
+        //        });
+        //        hospitalList.appendChild(div);
+        //    });
+        //}
+
+        function displayHospitalList(list) {
+            hospitalList.innerHTML = "";
+            var select = document.createElement("select");
+            select.addEventListener("change", function () {
+                var hospitalName = this.value;
+                var hospital = hospitals.find(function (hospital) {
+                    return hospital.name === hospitalName;
+                });
+                displayHospitalDetails(hospital);
+            });
+            var defaultOption = document.createElement("option");
+            defaultOption.text = "Select a hospital";
+            select.appendChild(defaultOption);
+            list.forEach(function (hospital) {
+                var option = document.createElement("option");
+                option.text = hospital.name;
+                select.appendChild(option);
+            });
+            hospitalList.appendChild(select);
+        }
+
+        // Function to display hospital details
+        function displayHospitalDetails(hospital) {
+            hospitalDetails.style.display = "block";
+            address.innerHTML = hospital.address;
+            phone.innerHTML = hospital.phone;
+            beds.innerHTML = hospital.beds;
+            doctors.innerHTML = "";
+            hospital.doctors.forEach(function (doctor) {
+                var li = document.createElement("li");
+                li.innerHTML = doctor.name + " (" + doctor.specialization + ")";
+                doctors.appendChild(li);
+            });
+        }
+
+        // Add event listener to search button
+        searchBtn.addEventListener("click", function () {
+            var location = searchBar.value.toLowerCase();
+            var filteredHospitals = hospitals.filter(function (hospital) {
+                return hospital.address.toLowerCase().indexOf(location) > -1;
+            });
+            if (filteredHospitals.length > 0) {
+                displayHospitalList(filteredHospitals);
+            } else {
+                hospitalList.innerHTML = "<p>No hospitals found.</p>";
+                hospitalDetails.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
